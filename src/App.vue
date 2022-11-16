@@ -53,13 +53,23 @@ export default {
 </script>
 
 <template>
-  <div class="container">
+  <div class="">
     <AppSearch @performSearch="search" />
-    <AppMain />
+    <main>
+      <AppMain />
+    </main>
   </div>
 
 </template>
 
 <style lang="scss">
 @use "./styles/general.scss" as *;
+@use "./styles/partials/variables" as *;
+
+main {
+  width: 100%;
+  height: calc(100vh - $header-height);
+  background-color: gray;
+  overflow-y: auto;
+}
 </style>
