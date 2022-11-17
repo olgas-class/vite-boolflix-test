@@ -3,11 +3,13 @@ import { store } from "./store";
 import axios from "axios";
 import AppSearch from "./components/AppSearch.vue";
 import AppMain from "./components/AppMain.vue";
+import AppLoader from "./components/AppLoader.vue";
 
 export default {
   components: {
     AppSearch,
-    AppMain
+    AppMain,
+    AppLoader
   },
   data() {
     return {
@@ -21,33 +23,74 @@ export default {
         api_key: this.store.apiKey,
         query: this.store.searchKey
       }
-      this.getMovies(paramsObj);
-      this.getSeries(paramsObj);
+
+      const moviesReq = axios.get(`${this.store.apiURL}/movie`, {
+        params: paramsObj
+      });
+      const seriesReq = axios.get(`${this.store.apiURL}/tv`, {
+        params: paramsObj
+      });
+
+      this.store.loading = true;
+
+      Promise.all([moviesReq, seriesReq]).then(responses => {
+        console.log("Arrivate le risposte");
+        this.store.movies = responses[0].data.results;
+        this.store.series = responses[1].data.results;
+        this.getMoviesDetails();
+      }).catch(err => {
+        console.log(err);
+      }).finally(() => {
+        console.log("Stop loading");
+        this.store.loading = false;
+      })
+
+      // this.getMovies(paramsObj);
+      // this.getSeries(paramsObj);
     },
-    getMovies(paramsObj) {
-      axios
-        .get(`${this.store.apiURL}/movie`, {
-          params: paramsObj
-        })
-        .then((resp) => {
-          this.store.movies = resp.data.results;
-        })
-        .catch(err => {
-          console.log(err);
-        })
+    getMoviesDetails() {
+      this.store.movies.forEach(movie => {
+        console.log("chiamata axios per cast");
+        console.log("Chiamate axios per generi");
+      })
     },
-    getSeries(paramsObj) {
-      axios
-        .get(`${this.store.apiURL}/tv`, {
-          params: paramsObj
-        })
-        .then((resp) => {
-          this.store.series = resp.data.results;
-        })
-        .catch(err => {
-          console.log(err);
-        })
-    }
+    // getMovies(paramsObj) {
+    //   this.store.loading = true;
+    //   axios
+    //     .get(`${this.store.apiURL}/movie`, {
+    //       params: paramsObj
+    //     })
+    //     .then((resp) => {
+    //       console.log('movies arrivati');
+    //       this.store.movies = resp.data.results;
+    //       this.getMoviesDetails();
+    //     })
+    //     .catch(err => {
+    //       console.log(err);
+    //     })
+    //     .finally(() => {
+    //       console.log('Loading stoppato');
+    //       this.store.loading = false;
+    //     })
+    // },
+    // getSeries(paramsObj) {
+    //   this.store.loading = true;
+    //   axios
+    //     .get(`${this.store.apiURL}/tv`, {
+    //       params: paramsObj
+    //     })
+    //     .then((resp) => {
+    //       console.log('Series arrivati');
+    //       this.store.series = resp.data.results;
+    //     })
+    //     .catch(err => {
+    //       console.log(err);
+    //     })
+    //     .finally(() => {
+    //       console.log('Loading stoppato');
+    //       this.store.loading = false;
+    //     })
+    // }
   }
 }
 </script>
@@ -56,7 +99,8 @@ export default {
   <div class="">
     <AppSearch @performSearch="search" />
     <main>
-      <AppMain />
+      <AppLoader v-if="store.loading" />
+      <AppMain v-else />
     </main>
   </div>
 

@@ -65,6 +65,9 @@ export default {
                     <!-- <i class="fa-regular fa-star"></i> -->
 
                 </div>
+                <div>
+                    <button @click="$emit('detailsClicked', item.id)">Vedi dettagli</button>
+                </div>
             </div>
         </div>
     </div>

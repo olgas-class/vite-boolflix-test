@@ -10,6 +10,11 @@ export default {
         return {
             store
         }
+    },
+    methods: {
+        getMovieDetails(clickedId) {
+            console.log("Fai chiamata axios per prendere i dettagli del movie. Il mio id è" + clickedId);
+        }
     }
 }
 </script>
@@ -20,7 +25,7 @@ export default {
             <h2>Movies</h2>
             <div class="row">
                 <div class="col" v-for="movie in store.movies" :key="movie.id">
-                    <AppCard :item="movie" />
+                    <AppCard @detailsClicked="getMovieDetails" :item="movie" />
                 </div>
             </div>
         </section>
